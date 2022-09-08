@@ -32,6 +32,7 @@ export const Home = ({ socket }: HomeProps) => {
         });
         socket.on('NEW_VS_DATA', (data: Versus) => {
             dataRef.current.push(data);
+            setMessage(`New data received! 🎉`);
         });
         _initData();
         return () => { socket.disconnect() };
