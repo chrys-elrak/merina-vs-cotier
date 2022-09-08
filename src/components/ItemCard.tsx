@@ -12,8 +12,8 @@ export const ItemCard = ({ data, onVote }: ItemCardProps) => {
     return (
         <>
             <Card>
-                <CardMedia style={{ height: MyTheme.value.boxHeight }} image={'xxxx'} />
-                <CardContent>
+                <CardMedia style={{ height: MyTheme.value.boxHeight }} image={`https://localhost:5000/static/${data?.image.filename}`} />
+                <CardContent style={{textAlign: 'center'}}>
                     <Typography gutterBottom variant="h5" component="h2">
                         {data?.title}
                     </Typography>

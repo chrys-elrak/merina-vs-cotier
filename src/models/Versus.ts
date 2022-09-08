@@ -22,6 +22,13 @@ export interface Item {
     title:       string;
     description: string;
     votes:       any[];
+    image:       Image;
     createdAt:   Date;
     __v:         number;
+}
+
+
+export interface Image {
+    filename: string;
+    mimetype: string;
 }
