@@ -1,5 +1,9 @@
 export const MyTheme = {
     colors: {
-        primary: '#0070f3',
+        primary: '#212D40',
+        white: '#FFFFFF',
     },
+    value: {
+        boxHeight: 550,
+    }
 }

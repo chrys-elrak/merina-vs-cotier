@@ -3,6 +3,7 @@ import { RefreshRounded } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { Footer } from "../components/Footer";
 import { ItemCard } from "../components/ItemCard";
+import { MyTheme } from "../constants/Theme";
 import { Item } from "../models/Item";
 const data = [
     { title: 'Merina 🥰', description: '', image: 'https://www.nm.org//-/media/northwestern/healthbeat/images/healthy-tips/nm-9-health-issues-women_feature.jpg' },
@@ -53,6 +54,7 @@ export const Home = () => {
         {!currentVs.length && <Box style={{ display: 'flex', flexDirection: 'column'}}>
             <Typography style={{ textAlign: 'center', fontSize: 20 }}>No more items</Typography>
             <Button variant={'text'} startIcon={<RefreshRounded/>} onClick={refreshHandler }>Refresh</Button>
+            <Box style={{height: MyTheme.value.boxHeight}}></Box>
         </Box>}
         <Footer />
     </>

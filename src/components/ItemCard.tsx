@@ -1,4 +1,5 @@
-import { Card, CardMedia, CardContent, Typography, CardActions, Button } from '@material-ui/core'
+import { Button, Card, CardActions, CardContent, CardMedia } from '@material-ui/core';
+import { MyTheme } from '../constants/Theme';
 import { Item } from '../models/Item';
 
 
@@ -11,7 +12,7 @@ export const ItemCard = ({ data, onVote }: ItemCardProps) => {
     return (
         <>
             <Card>
-                <CardMedia style={{ height: 500 }} image={data?.image} />
+                <CardMedia style={{ height: MyTheme.value.boxHeight }} image={data?.image} />
                 <CardContent>
                     {/* <Typography gutterBottom variant="h5" component="h2">
                         {data?.title}
@@ -21,7 +22,7 @@ export const ItemCard = ({ data, onVote }: ItemCardProps) => {
                     </Typography> */}
                 </CardContent>
                 <CardActions>
-                    <Button size="large" style={{ width: '100%'}} color="primary" onClick={() => onVote(data)}>
+                    <Button size="large" variant='outlined' style={{ width: '100%'}} onClick={() => onVote(data)}>
                         I like this
                     </Button>
                 </CardActions>
