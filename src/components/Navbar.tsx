@@ -6,7 +6,7 @@ const appSecret = '5c6f6969a96d11da65bc18236a5024ec';
 const redirectUri = 'https://localhost:5000';
 
 const urlForAccessToken = `https://graph.facebook.com/oauth/access_token?client_id=8024871117554237&client_secret=5c6f6969a96d11da65bc18236a5024ec&grant_type=client_credentials`;
-const withoutAT = `https://graph.facebook.com/{api-endpoint}&access_token=${clientId}|${appSecret}`;
+const withouAT = `https://graph.facebook.com/{api-endpoint}&access_token=${clientId}|${appSecret}`;
 export function Navbar() {
   const handleFacebookLogin = () => {
     // open facebook login popup
