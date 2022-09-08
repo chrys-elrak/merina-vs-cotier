@@ -35,7 +35,7 @@ export const Home = () => {
             setCurrentPage(0);
     }
 
-    const votingHandler = (item: Item) => {
+    const votingHandler = (item: Item | undefined) => {
         setCurrentPage((prev) => prev + 2);
     }
 
