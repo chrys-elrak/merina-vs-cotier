@@ -1,5 +1,7 @@
-import { Grid, Typography } from "@material-ui/core";
+import { Box, Button, Grid, Typography } from "@material-ui/core";
+import { RefreshRounded } from "@mui/icons-material";
 import { useEffect, useState } from "react";
+import { Footer } from "../components/Footer";
 import { ItemCard } from "../components/ItemCard";
 import { Item } from "../models/Item";
 const data = [
@@ -24,27 +26,34 @@ export const Home = () => {
         if (slicedData.length === 3) {
             setCurrentVs(slicedData);
         } else {
-            setCurrentVs(data);
-            setCurrentPage(0);
+            setCurrentVs([]);
         }
     }, [currentPage]);
+
+    const refreshHandler = () => {
+        setCurrentVs([]);
+            setCurrentPage(0);
+    }
 
     const votingHandler = (item: Item) => {
         setCurrentPage((prev) => prev + 2);
     }
 
-    return <Grid container spacing={3}>
-        {currentVs.length !== 0 && currentVs.map((item, k) => <Grid item xs={k % 2 === 0 ? 5 : 2} key={k}>
-            {
-                k % 2 === 0 ? <ItemCard data={item} onVote={votingHandler} /> :
-                    <Typography style={{ fontSize: 50, textAlign: 'center', height: '100%', lineHeight: 10 }}>VS</Typography>
-            }
-        </Grid>
+    return <>
+        <Grid container spacing={3}>
+            {currentVs.length !== 0 && currentVs.map((item, k) => <Grid item xs={k % 2 === 0 ? 5 : 2} key={k}>
+                {
+                    k % 2 === 0 ? <ItemCard data={item} onVote={votingHandler} /> :
+                        <Typography style={{ fontSize: 50, textAlign: 'center', height: '100%', lineHeight: 10 }}>VS</Typography>
+                }
+            </Grid>
 
-        )}
-        {
-            currentVs.length === 0 && <Typography>No more items</Typography>
-        }
-
-    </Grid >
+            )}
+        </Grid >
+        {!currentVs.length && <Box style={{ display: 'flex', flexDirection: 'column'}}>
+            <Typography style={{ textAlign: 'center', fontSize: 20 }}>No more items</Typography>
+            <Button variant={'text'} startIcon={<RefreshRounded/>} onClick={refreshHandler }>Refresh</Button>
+        </Box>}
+        <Footer />
+    </>
 }
