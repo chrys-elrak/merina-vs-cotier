@@ -1,6 +1,6 @@
-import { Button, Card, CardActions, CardContent, CardMedia } from '@material-ui/core';
+import { Button, Card, CardActions, CardContent, CardMedia, Typography } from '@material-ui/core';
 import { MyTheme } from '../constants/Theme';
-import { Item } from '../models/Item';
+import { Item } from '../models/Versus';
 
 
 interface ItemCardProps {
@@ -12,14 +12,14 @@ export const ItemCard = ({ data, onVote }: ItemCardProps) => {
     return (
         <>
             <Card>
-                <CardMedia style={{ height: MyTheme.value.boxHeight }} image={data?.image} />
+                <CardMedia style={{ height: MyTheme.value.boxHeight }} image={'xxxx'} />
                 <CardContent>
-                    {/* <Typography gutterBottom variant="h5" component="h2">
+                    <Typography gutterBottom variant="h5" component="h2">
                         {data?.title}
                     </Typography>
                     <Typography variant="body2" color="textSecondary" component="p">
                         {data?.description}
-                    </Typography> */}
+                    </Typography>
                 </CardContent>
                 <CardActions>
                     <Button size="large" variant='outlined' style={{ width: '100%'}} onClick={() => onVote(data)}>

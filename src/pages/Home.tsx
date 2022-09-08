@@ -1,11 +1,13 @@
 import { Box, Button, Grid, Typography } from "@material-ui/core";
 import { RefreshRounded } from "@mui/icons-material";
-import { useEffect, useState } from "react";
+import { red } from "@mui/material/colors";
+import axios from "axios";
+import { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { Footer } from "../components/Footer";
 import { ItemCard } from "../components/ItemCard";
 import { MyTheme } from "../constants/Theme";
-import { Item } from "../models/Item";
+import { Item, Versus } from "../models/Versus";
 const data = [
     { title: 'Merina 🥰', description: '', image: 'https://www.nm.org//-/media/northwestern/healthbeat/images/healthy-tips/nm-9-health-issues-women_feature.jpg' },
     { title: 'Cotier 😘', description: '', image: 'https://img.freepik.com/photos-gratuite/plan-horizontal-jolie-femme-peau-foncee-coiffure-afro-large-sourire-dents-blanches-montre-quelque-chose-gentil-ami-pointe-dans-coin-superieur-droit-se-tient-contre-mur_273609-16442.jpg' },
@@ -18,51 +20,55 @@ interface HomeProps {
 }
 
 export const Home = ({ socket }: HomeProps) => {
-    const [currentVs, setCurrentVs] = useState<Item[]>([]);
-    const [currentPage, setCurrentPage] = useState(0);
+    const dataRef = useRef<Versus[]>([]);
+    const [versus, setVersus] = useState<Item[]>();
+    const [currentPageNumber, setCurrentPage] = useState(0);
 
     useEffect(() => {
         socket.on('FACEBOOK_USER_DATA', (user: any) => {
             console.log(user);
         });
-        const slicedData = data.slice(currentPage, currentPage + 2);
-        // place one item between the two elements
-        slicedData.splice(1, 0, {
-            title: 'VS',
-            description: '',
-            image: 'https://image.shutterstock.com/image-photo/versus-sign-260nw-102030828.jpg'
-        });
-        if (slicedData.length === 3) {
-            setCurrentVs(slicedData);
-        } else {
-            setCurrentVs([]);
-        }
-    }, [currentPage, socket]);
+        axios.get(`https://localhost:5000/api/v1/versus`)
+            .then(res => {
+                dataRef.current = res.data as Versus[];
+                _nextVersus();
+            }).catch(err => console.log(err));
+        return () => { socket.disconnect() };
+    }, []);
 
     const refreshHandler = () => {
-        setCurrentVs([]);
-            setCurrentPage(0);
+        setCurrentPage(0);
+    }
+
+    const _nextVersus = () => {
+        if (currentPageNumber < dataRef.current.length) {
+            setCurrentPage(currentPageNumber + 1);
+            const v: Versus = dataRef.current[currentPageNumber];
+            setVersus([v.items[0], {} as any, v.items[1]]);
+        } else {
+            console.log('NOPE', currentPageNumber, dataRef.current.length);
+            
+        }
     }
 
     const votingHandler = (item: Item | undefined) => {
-        setCurrentPage((prev) => prev + 2);
+        _nextVersus();
     }
 
     return <>
         <Grid container spacing={3}>
-            {currentVs.length !== 0 && currentVs.map((item, k) => <Grid item xs={k % 2 === 0 ? 5 : 2} key={k}>
+            {versus?.map((item, k) => <Grid item xs={k % 2 === 0 ? 5 : 2} key={k}>
                 {
                     k % 2 === 0 ? <ItemCard data={item} onVote={votingHandler} /> :
                         <Typography style={{ fontSize: 50, textAlign: 'center', height: '100%', lineHeight: 10 }}>VS</Typography>
                 }
             </Grid>
-
             )}
         </Grid >
-        {!currentVs.length && <Box style={{ display: 'flex', flexDirection: 'column'}}>
+        {!versus?.length && <Box style={{ display: 'flex', flexDirection: 'column' }}>
             <Typography style={{ textAlign: 'center', fontSize: 20 }}>No more items</Typography>
-            <Button variant={'text'} startIcon={<RefreshRounded/>} onClick={refreshHandler }>Refresh</Button>
-            <Box style={{height: MyTheme.value.boxHeight}}></Box>
+            <Button variant={'text'} startIcon={<RefreshRounded />} onClick={refreshHandler}>Refresh</Button>
+            <Box style={{ height: MyTheme.value.boxHeight }}></Box>
         </Box>}
         <Footer />
     </>
