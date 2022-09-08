@@ -1,12 +1,13 @@
-import { Box, Button, Grid, Typography } from "@material-ui/core";
+import { Box, Button, Grid, Snackbar, Typography } from "@material-ui/core";
 import { RefreshRounded } from "@mui/icons-material";
-import { red } from "@mui/material/colors";
+import { Alert, AlertTitle } from "@mui/material";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { Footer } from "../components/Footer";
 import { ItemCard } from "../components/ItemCard";
 import { MyTheme } from "../constants/Theme";
+import { FacebookDataResponse } from "../models/User";
 import { Item, Versus } from "../models/Versus";
 const data = [
     { title: 'Merina 🥰', description: '', image: 'https://www.nm.org//-/media/northwestern/healthbeat/images/healthy-tips/nm-9-health-issues-women_feature.jpg' },
@@ -21,20 +22,28 @@ interface HomeProps {
 
 export const Home = ({ socket }: HomeProps) => {
     const dataRef = useRef<Versus[]>([]);
+    const [message, setMessage] = useState('');
     const [versus, setVersus] = useState<Item[]>();
     const [currentPageNumber, setCurrentPage] = useState(0);
 
     useEffect(() => {
-        socket.on('FACEBOOK_USER_DATA', (user: any) => {
-            console.log(user);
+        socket.on('FACEBOOK_USER_DATA', (user: FacebookDataResponse) => {
+            setMessage(`Hello ${user.data.user.name} 👋!`);
         });
+        socket.on('NEW_VS_DATA', (data: Versus) => {
+            dataRef.current.push(data);
+        });
+        _initData();
+        return () => { socket.disconnect() };
+    }, []);
+
+    const _initData = () => {
         axios.get(`https://localhost:5000/api/v1/versus`)
             .then(res => {
                 dataRef.current = res.data as Versus[];
                 _nextVersus();
             }).catch(err => console.log(err));
-        return () => { socket.disconnect() };
-    }, []);
+    }
 
     const refreshHandler = () => {
         setCurrentPage(0);
@@ -47,7 +56,7 @@ export const Home = ({ socket }: HomeProps) => {
             setVersus([v.items[0], {} as any, v.items[1]]);
         } else {
             console.log('NOPE', currentPageNumber, dataRef.current.length);
-            
+
         }
     }
 
@@ -56,7 +65,12 @@ export const Home = ({ socket }: HomeProps) => {
     }
 
     return <>
-        <Grid container spacing={3}>
+        <Snackbar open={message !== ''} autoHideDuration={6000} onClose={() => setMessage('')}>
+            <Alert severity="success" sx={{ width: '100%' }}>
+                {message}
+            </Alert>
+        </Snackbar>
+        <Grid container>
             {versus?.map((item, k) => <Grid item xs={k % 2 === 0 ? 5 : 2} key={k}>
                 {
                     k % 2 === 0 ? <ItemCard data={item} onVote={votingHandler} /> :
