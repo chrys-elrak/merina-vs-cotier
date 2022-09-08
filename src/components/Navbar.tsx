@@ -2,11 +2,8 @@ import { AppBar, Toolbar, IconButton, Typography, Button } from '@material-ui/co
 import { Facebook } from '@mui/icons-material'
 import { MyTheme } from '../constants/Theme'
 const clientId = '8024871117554237';
-const appSecret = '5c6f6969a96d11da65bc18236a5024ec';
-const redirectUri = 'https://localhost:5000';
+const redirectUri = 'https://localhost:5000/facebook/__auth/callback';
 
-const urlForAccessToken = `https://graph.facebook.com/oauth/access_token?client_id=8024871117554237&client_secret=5c6f6969a96d11da65bc18236a5024ec&grant_type=client_credentials`;
-const withouAT = `https://graph.facebook.com/{api-endpoint}&access_token=${clientId}|${appSecret}`;
 export function Navbar() {
   const handleFacebookLogin = () => {
     // open facebook login popup

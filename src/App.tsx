@@ -2,12 +2,15 @@ import { AppBar, Button, Container, IconButton, Toolbar, Typography } from "@mat
 import { Route, Routes } from "react-router-dom"
 import { Navbar } from "./components/Navbar"
 import { Home } from "./pages/Home"
+import socketIO from 'socket.io-client';
+
+const socket = socketIO('https://localhost:5000');
 
 function App() {
   return <Container maxWidth="lg">
-   <Navbar />
+    <Navbar />
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<Home socket={socket} />} />
     </Routes>
   </Container>
 }

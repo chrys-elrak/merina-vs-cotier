@@ -1,6 +1,7 @@
 import { Box, Button, Grid, Typography } from "@material-ui/core";
 import { RefreshRounded } from "@mui/icons-material";
 import { useEffect, useState } from "react";
+import { Socket } from "socket.io-client";
 import { Footer } from "../components/Footer";
 import { ItemCard } from "../components/ItemCard";
 import { MyTheme } from "../constants/Theme";
@@ -12,11 +13,18 @@ const data = [
     { title: 'Bandy milay be Cotier 🤫', description: '', image: 'https://img.freepik.com/premium-photo/league-his-own-cropped-shot-calm-muscular-man-isolated-black_590464-31782.jpg' },
 ];
 
-export const Home = () => {
+interface HomeProps {
+    socket: Socket
+}
+
+export const Home = ({ socket }: HomeProps) => {
     const [currentVs, setCurrentVs] = useState<Item[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
 
     useEffect(() => {
+        socket.on('FACEBOOK_USER_DATA', (user: any) => {
+            console.log(user);
+        });
         const slicedData = data.slice(currentPage, currentPage + 2);
         // place one item between the two elements
         slicedData.splice(1, 0, {
@@ -29,7 +37,7 @@ export const Home = () => {
         } else {
             setCurrentVs([]);
         }
-    }, [currentPage]);
+    }, [currentPage, socket]);
 
     const refreshHandler = () => {
         setCurrentVs([]);
