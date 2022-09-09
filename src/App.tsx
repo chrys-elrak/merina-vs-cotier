@@ -1,26 +1,43 @@
 import { Container } from "@material-ui/core";
 import { useContext, useEffect } from 'react';
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import socketIO from 'socket.io-client';
 import { getFbClientId, getFbRedirectUri, getSocketUrl } from "./app.env";
 import { MyAlert } from "./components/MyAlert";
 import { Navbar } from "./components/Navbar";
 import { GlobalContext } from './contexts/global';
-import { GlobalContextProvider } from './contexts/global/provider';
 import { FacebookDataResponse } from './models/User';
 import { Home } from "./pages/Home";
 
 const socket = socketIO(getSocketUrl());
 
+
 function App() {
 
-  const { setMessage } = useContext(GlobalContext);
+  const { setMessage, setIsAuthenticated, setToken, setUser } = useContext(GlobalContext);
 
   useEffect(() => {
+    initSocket();
+    const token = localStorage.getItem('token') && setIsAuthenticated(true);
+    if (token) {
+      setToken(token);
+    }
+    const user = localStorage.getItem('user');
+    if (user) {
+      setUser(JSON.parse(user));
+    }
+  }, []);
+
+  const initSocket = () => {
     socket.on('FACEBOOK_USER_DATA', (fb: FacebookDataResponse) => {
       setMessage({ open: true, text: `Welcome ${fb.data.user.name}`, severity: "success" });
+      window.localStorage.setItem('token', fb.data.token);
+      window.localStorage.setItem('user', JSON.stringify(fb.data.user));
+      setIsAuthenticated(true);
+      setToken(fb.data.token);
+      setUser(fb.data.user);
     });
-  }, []);
+  }
 
   const handleFacebookLogin = () => {
     // open Facebook login popup
@@ -30,9 +47,18 @@ function App() {
 
   return <Container maxWidth="lg">
     <MyAlert />
-    <Navbar handleFacebookLogin={handleFacebookLogin} />
     <Routes>
-      <Route path="/" element={<Home socket={socket} />} />
+      <Route path="/" element={
+        <>
+          <Navbar handleFacebookLogin={handleFacebookLogin} />
+          <Outlet />
+        </>
+      }>
+        <Route index element={
+          <Home socket={socket} />
+        } />
+      </Route>
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   </Container>
 }
