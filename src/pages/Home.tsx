@@ -1,7 +1,7 @@
 import { Box, Button, Grid, Snackbar, Typography } from "@material-ui/core";
 import { RefreshRounded } from "@mui/icons-material";
-import { Alert, AlertTitle } from "@mui/material";
-import axios from "axios";
+import { Alert, AlertColor, AlertTitle } from "@mui/material";
+import axios, { AxiosResponse } from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { Footer } from "../components/Footer";
@@ -9,72 +9,67 @@ import { ItemCard } from "../components/ItemCard";
 import { MyTheme } from "../constants/Theme";
 import { FacebookDataResponse } from "../models/User";
 import { Item, Versus } from "../models/Versus";
-const data = [
-    { title: 'Merina 🥰', description: '', image: 'https://www.nm.org//-/media/northwestern/healthbeat/images/healthy-tips/nm-9-health-issues-women_feature.jpg' },
-    { title: 'Cotier 😘', description: '', image: 'https://img.freepik.com/photos-gratuite/plan-horizontal-jolie-femme-peau-foncee-coiffure-afro-large-sourire-dents-blanches-montre-quelque-chose-gentil-ami-pointe-dans-coin-superieur-droit-se-tient-contre-mur_273609-16442.jpg' },
-    { title: 'Bandy Merina 😇', description: '', image: 'https://us.123rf.com/450wm/kiuikson/kiuikson1608/kiuikson160800169/62133631-portrait-de-sourire-mod%C3%A8le-masculin.jpg' },
-    { title: 'Bandy milay be Cotier 🤫', description: '', image: 'https://img.freepik.com/premium-photo/league-his-own-cropped-shot-calm-muscular-man-isolated-black_590464-31782.jpg' },
-];
 
+const initialMessage = { open: false, text: "", severity: "success" };
 interface HomeProps {
     socket: Socket
 }
 
 export const Home = ({ socket }: HomeProps) => {
     const dataRef = useRef<Versus[]>([]);
-    const [message, setMessage] = useState('');
+    const [message, setMessage] = useState(initialMessage);
     const [versus, setVersus] = useState<Item[]>();
-    const [currentPageNumber, setCurrentPage] = useState(0);
+    const currentPageNumber = useRef(0);
 
     useEffect(() => {
-        socket.on('FACEBOOK_USER_DATA', (user: FacebookDataResponse) => {
-            setMessage(`Hello ${user.data.user.name} 👋!`);
+        socket.on('FACEBOOK_USER_DATA', (fb: FacebookDataResponse) => {
+            setMessage(() => ({ open: true, text: `Welcome ${fb.data.user.name}`, severity: "success" }));
         });
         socket.on('NEW_VS_DATA', (data: Versus) => {
             dataRef.current.push(data);
-            setMessage(`New data received! 🎉`);
+            setMessage(() => ({ open: true, text: `New data received! 🎉`, severity: "success" }));
         });
         _initData();
         return () => { socket.disconnect() };
     }, []);
 
     const _initData = () => {
+        currentPageNumber.current = 0;
         axios.get(`https://localhost:5000/api/v1/versus`)
-            .then(res => {
-                dataRef.current = res.data as Versus[];
+            .then(({ data }: AxiosResponse<Versus[]>) => {
+                dataRef.current = data;
                 _nextVersus();
-            }).catch(err => console.log(err));
-    }
-
-    const refreshHandler = () => {
-        setCurrentPage(0);
+            }).catch(err => {
+                setMessage(() => ({ open: true, text: err.message, severity: "error" }));
+            });
     }
 
     const _nextVersus = () => {
-        if (currentPageNumber < dataRef.current.length) {
-            setCurrentPage(currentPageNumber + 1);
-            const v: Versus = dataRef.current[currentPageNumber];
-            setVersus([v.items[0], {} as any, v.items[1]]);
-        } else {
-            console.log('NOPE', currentPageNumber, dataRef.current.length);
-
+        if (currentPageNumber.current + 1 <= dataRef.current.length) {
+            const v: Versus = dataRef.current[currentPageNumber.current];
+            if (v) {
+                setVersus([v.items[0], {} as any, v.items[1]]);
+            }
+            currentPageNumber.current++;
+        }
+        else {
+            currentPageNumber.current = 0;
+            if (dataRef.current.length > 0) {
+                _nextVersus();
+            }
         }
     }
 
-    const votingHandler = (item: Item | undefined) => {
-        _nextVersus();
-    }
-
     return <>
-        <Snackbar open={message !== ''} autoHideDuration={6000} onClose={() => setMessage('')}>
-            <Alert severity="success" sx={{ width: '100%' }}>
-                {message}
+        <Snackbar open={message.open} autoHideDuration={6000} onClose={() => setMessage(initialMessage)}>
+            <Alert severity={message.severity as AlertColor} sx={{ width: '100%' }}>
+                {message.text}
             </Alert>
         </Snackbar>
         <Grid container>
             {versus?.map((item, k) => <Grid item xs={k % 2 === 0 ? 5 : 2} key={k}>
                 {
-                    k % 2 === 0 ? <ItemCard data={item} onVote={votingHandler} /> :
+                    k % 2 === 0 ? <ItemCard data={item} onVote={() => _nextVersus()} /> :
                         <Typography style={{ fontSize: 50, textAlign: 'center', height: '100%', lineHeight: 10 }}>VS</Typography>
                 }
             </Grid>
@@ -82,7 +77,7 @@ export const Home = ({ socket }: HomeProps) => {
         </Grid >
         {!versus?.length && <Box style={{ display: 'flex', flexDirection: 'column' }}>
             <Typography style={{ textAlign: 'center', fontSize: 20 }}>No more items</Typography>
-            <Button variant={'text'} startIcon={<RefreshRounded />} onClick={refreshHandler}>Refresh</Button>
+            <Button variant={'text'} startIcon={<RefreshRounded />} onClick={_initData}>Refresh</Button>
             <Box style={{ height: MyTheme.value.boxHeight }}></Box>
         </Box>}
         <Footer />
