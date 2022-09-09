@@ -1,33 +1,30 @@
-import { Box, Button, Grid, Snackbar, Typography } from "@material-ui/core";
+import { Box, Button, Grid, Typography } from "@material-ui/core";
 import { RefreshRounded } from "@mui/icons-material";
-import { Alert, AlertColor, AlertTitle } from "@mui/material";
 import axios, { AxiosResponse } from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
+import { getApiUrl } from "../app.env";
 import { Footer } from "../components/Footer";
 import { ItemCard } from "../components/ItemCard";
+import { MyAlert } from "../components/MyAlert";
 import { MyTheme } from "../constants/Theme";
-import { FacebookDataResponse } from "../models/User";
+import { GlobalContext } from "../contexts/global";
 import { Item, Versus } from "../models/Versus";
 
-const initialMessage = { open: false, text: "", severity: "success" };
 interface HomeProps {
     socket: Socket
 }
 
 export const Home = ({ socket }: HomeProps) => {
     const dataRef = useRef<Versus[]>([]);
-    const [message, setMessage] = useState(initialMessage);
     const [versus, setVersus] = useState<Item[]>();
     const currentPageNumber = useRef(0);
+    const { setMessage } = useContext(GlobalContext);
 
     useEffect(() => {
-        socket.on('FACEBOOK_USER_DATA', (fb: FacebookDataResponse) => {
-            setMessage(() => ({ open: true, text: `Welcome ${fb.data.user.name}`, severity: "success" }));
-        });
         socket.on('NEW_VS_DATA', (data: Versus) => {
+            setMessage({ open: true, text: `New data received! 🎉`, severity: "success" });
             dataRef.current.push(data);
-            setMessage(() => ({ open: true, text: `New data received! 🎉`, severity: "success" }));
         });
         _initData();
         return () => { socket.disconnect() };
@@ -35,7 +32,7 @@ export const Home = ({ socket }: HomeProps) => {
 
     const _initData = () => {
         currentPageNumber.current = 0;
-        axios.get(`https://localhost:5000/api/v1/versus`)
+        axios.get(getApiUrl() + '/versus')
             .then(({ data }: AxiosResponse<Versus[]>) => {
                 dataRef.current = data;
                 _nextVersus();
@@ -61,11 +58,6 @@ export const Home = ({ socket }: HomeProps) => {
     }
 
     return <>
-        <Snackbar open={message.open} autoHideDuration={6000} onClose={() => setMessage(initialMessage)}>
-            <Alert severity={message.severity as AlertColor} sx={{ width: '100%' }}>
-                {message.text}
-            </Alert>
-        </Snackbar>
         <Grid container>
             {versus?.map((item, k) => <Grid item xs={k % 2 === 0 ? 5 : 2} key={k}>
                 {
@@ -75,11 +67,13 @@ export const Home = ({ socket }: HomeProps) => {
             </Grid>
             )}
         </Grid >
-        {!versus?.length && <Box style={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography style={{ textAlign: 'center', fontSize: 20 }}>No more items</Typography>
-            <Button variant={'text'} startIcon={<RefreshRounded />} onClick={_initData}>Refresh</Button>
-            <Box style={{ height: MyTheme.value.boxHeight }}></Box>
-        </Box>}
+        {
+            !versus?.length && <Box style={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography style={{ textAlign: 'center', fontSize: 20 }}>No more items</Typography>
+                <Button variant={'text'} startIcon={<RefreshRounded />} onClick={_initData}>Refresh</Button>
+                <Box style={{ height: MyTheme.value.boxHeight }}></Box>
+            </Box>
+        }
         <Footer />
     </>
 }
