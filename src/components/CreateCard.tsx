@@ -51,10 +51,14 @@ export function CreateCard({ onChange, active }: { onChange: (data: any) => void
         </CardContent>
         <CardActions>
             <Button
-                disabled={!active}
-                onClick={() =>
-                    onChange({ image, title, description })
-                }>Done</Button>
+                disabled={!active || !image}
+                onClick={() => {
+                    if (!image) {
+                        alert('Please select an image');
+                        return;
+                    }
+                    onChange({ image, title, description });
+                }}>Done</Button>
         </CardActions>
     </Card >;
 }
