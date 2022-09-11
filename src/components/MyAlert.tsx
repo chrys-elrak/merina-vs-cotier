@@ -11,7 +11,7 @@ export const MyAlert = () => {
         setMessage((m: MyMessageContextType) => ({ ...m, open: false }));
     }
 
-    return <Snackbar open={message?.open} autoHideDuration={6000}>
+    return <Snackbar open={message?.open} autoHideDuration={6000} onClose={closeAction}>
         <Alert
             severity={message?.severity as AlertColor}
             sx={{ width: '100%' }}
