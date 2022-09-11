@@ -1,5 +1,5 @@
 import { AppBar, Avatar, Button, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, MenuList, Toolbar, Tooltip, Typography } from '@material-ui/core';
-import { Facebook, Logout, Send } from '@mui/icons-material';
+import { Facebook, Home, HomeOutlined, Logout, Send } from '@mui/icons-material';
 import { useContext, useState } from 'react';
 import { MyTheme } from '../constants/Theme';
 import { GlobalContext } from '../contexts/global';
@@ -34,7 +34,8 @@ export function Navbar({ handleFacebookLogin }: NavbarProps) {
     <>
       <AppBar position="static" style={{ marginBottom: 50, background: MyTheme.colors.primary }}>
         <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu">
+          <IconButton edge="start" onClick={() => navigation("/home")} color="inherit" aria-label="menu">
+            <HomeOutlined />
           </IconButton>
           <Typography variant="h6" style={{ flexGrow: 1 }}>
             Ampitahao

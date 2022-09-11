@@ -59,7 +59,7 @@ function App() {
           <Outlet />
         </>
       }>
-        <Route index element={
+        <Route path="home" element={
           <Home socket={socket} />
         } />
         <Route
@@ -67,7 +67,7 @@ function App() {
           element={<Create />}
         />
       </Route>
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route path="*" element={<Navigate to="/home" />} />
     </Routes>
   </Container>
 }
