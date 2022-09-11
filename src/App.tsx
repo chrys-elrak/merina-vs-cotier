@@ -7,6 +7,7 @@ import { MyAlert } from "./components/MyAlert";
 import { Navbar } from "./components/Navbar";
 import { GlobalContext } from './contexts/global';
 import { FacebookDataResponse } from './models/User';
+import { Versus } from "./models/Versus";
 import { Create } from "./pages/Create";
 import { Home } from "./pages/Home";
 
@@ -38,6 +39,9 @@ function App() {
       setToken(fb.data.token);
       setUser(fb.data.user);
     });
+    socket.on('NEW_VS_DATA', (data: Versus) => {
+      setMessage({ open: true, text: `New data received! 🎉`, severity: "success" });
+  });
   }
 
   const handleFacebookLogin = () => {
