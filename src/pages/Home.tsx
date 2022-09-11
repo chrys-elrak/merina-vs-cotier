@@ -6,7 +6,6 @@ import { Socket } from "socket.io-client";
 import { getApiUrl } from "../app.env";
 import { Footer } from "../components/Footer";
 import { ItemCard } from "../components/ItemCard";
-import { MyAlert } from "../components/MyAlert";
 import { MyTheme } from "../constants/Theme";
 import { GlobalContext } from "../contexts/global";
 import { Item, Versus } from "../models/Versus";
@@ -23,7 +22,6 @@ export const Home = ({ socket }: HomeProps) => {
 
     useEffect(() => {
         socket.on('NEW_VS_DATA', (data: Versus) => {
-            setMessage({ open: true, text: `New data received! 🎉`, severity: "success" });
             dataRef.current.push(data);
         });
         _initData();
