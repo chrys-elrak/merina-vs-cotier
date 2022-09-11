@@ -7,17 +7,19 @@ import { useRef, useState } from "react";
 export function CreateCard({ onChange, active }: { onChange: (data: any) => void, active?: boolean }) {
 
     const ref = useRef<HTMLInputElement>(null);
-    const [image, setImage] = useState<string | ArrayBuffer | null>(null);
+    const [image, setImage] = useState<File | null>(null);
+    const [imageSrc, setImageSrc] = useState<string | ArrayBuffer | null>(null);
     const [title, setTitle] = useState<string>('');
     const [description, setDescription] = useState<string>('');
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
+            setImage(e.target.files[0]);
             let reader = new FileReader();
             reader.readAsDataURL(e.target.files[0]);
             reader.onload = (e) => {
                 if (e.target?.result) {
-                    setImage(e.target.result);
+                    setImageSrc(e.target.result);
                 }
             };
         }
@@ -37,7 +39,7 @@ export function CreateCard({ onChange, active }: { onChange: (data: any) => void
                         ref?.current?.click();
                     }
                 }}
-                image={(image || placeholder) as any} />
+                image={(imageSrc || placeholder) as any} />
         </Box>
         <CardContent>
             <TextField disabled={!active} fullWidth onChange={(e) => setTitle(e.target.value)} label="Title" />
