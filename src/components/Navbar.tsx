@@ -5,6 +5,7 @@ import { MyTheme } from '../constants/Theme';
 import { GlobalContext } from '../contexts/global';
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useNavigate } from 'react-router-dom';
 interface NavbarProps {
   handleFacebookLogin: () => void;
 }
@@ -14,6 +15,7 @@ export function Navbar({ handleFacebookLogin }: NavbarProps) {
   const { isAuthenticated, user, setIsAuthenticated, setUser, setToken } = useContext(GlobalContext);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const navigation = useNavigate();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -64,7 +66,7 @@ export function Navbar({ handleFacebookLogin }: NavbarProps) {
                   </ListItemIcon>
                   <ListItemText>Profile</ListItemText>
                 </MenuItem>
-                <MenuItem onClick={handleClose}>
+                <MenuItem onClick={() => navigation('create')}>
                   <ListItemIcon>
                     <Send fontSize="small" />
                   </ListItemIcon>

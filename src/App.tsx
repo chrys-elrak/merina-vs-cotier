@@ -7,6 +7,7 @@ import { MyAlert } from "./components/MyAlert";
 import { Navbar } from "./components/Navbar";
 import { GlobalContext } from './contexts/global';
 import { FacebookDataResponse } from './models/User';
+import { Create } from "./pages/Create";
 import { Home } from "./pages/Home";
 
 const socket = socketIO(getSocketUrl());
@@ -57,6 +58,10 @@ function App() {
         <Route index element={
           <Home socket={socket} />
         } />
+        <Route
+          path="create"
+          element={<Create />}
+        />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
