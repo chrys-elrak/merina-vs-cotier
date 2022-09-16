@@ -13,6 +13,7 @@ export interface UserClass {
     name:    string;
     email:   string;
     picture: Picture;
+    _id: string;
 }
 
 export interface Picture {

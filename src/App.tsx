@@ -10,6 +10,7 @@ import { FacebookDataResponse } from './models/User';
 import { Versus } from "./models/Versus";
 import { Create } from "./pages/Create";
 import { Home } from "./pages/Home";
+import { facebookAuthService } from "./services/facebookAuth";
 
 const socket = socketIO(getSocketUrl());
 
@@ -44,22 +45,18 @@ function App() {
   });
   }
 
-  const handleFacebookLogin = () => {
-    // open Facebook login popup
-    const url = `https://www.facebook.com/v14.0/dialog/oauth?client_id=${getFbClientId()}&redirect_uri=${getFbRedirectUri()}&display=popup&response_type=token&auth_type=rerequest `;
-    window.open(url, '_blank', 'width=600,height=600');
-  }
+
 
   return <Container maxWidth="lg">
     <MyAlert />
     <Routes>
-      <Route path="/" element={
+      <Route path="" element={
         <>
-          <Navbar handleFacebookLogin={handleFacebookLogin} />
+          <Navbar handleFacebookLogin={facebookAuthService.login} />
           <Outlet />
         </>
       }>
-        <Route path="home" element={
+        <Route path="" element={
           <Home socket={socket} />
         } />
         <Route
@@ -67,7 +64,7 @@ function App() {
           element={<Create />}
         />
       </Route>
-      <Route path="*" element={<Navigate to="/home" />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   </Container>
 }
