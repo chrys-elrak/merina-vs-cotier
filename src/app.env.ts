@@ -8,7 +8,7 @@ const AppEnv = {
         url: 'https://localhost:5000'
     },
     fb: {
-        clientId: '8024871117554237',
+        clientId: '8024871117554237', // App id
         redirectUri: '/facebook/__auth/callback',
     }
 };

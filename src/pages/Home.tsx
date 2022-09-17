@@ -3,13 +3,15 @@ import {RefreshRounded} from "@mui/icons-material";
 import axios, {AxiosResponse} from "axios";
 import {useContext, useEffect, useRef, useState} from "react";
 import {Socket} from "socket.io-client";
-import {getApiUrl} from "../app.env";
+import {getApiUrl, getFbClientId} from "../app.env";
 import {Footer} from "../components/Footer";
 import {ItemCard} from "../components/ItemCard";
 import {MyTheme} from "../constants/Theme";
 import {GlobalContext} from "../contexts/global";
 import {Item, Versus} from "../models/Versus";
 import {facebookAuthService} from "../services/facebookAuth";
+
+
 
 interface HomeProps {
     socket: Socket
@@ -33,7 +35,6 @@ export const Home = ({socket}: HomeProps) => {
 
     function alreadyVoted(item: Item): boolean {
         const currentVs = dataRef.current[currentPageNumber.current - 1];
-        console.log(currentVs, user);
         return currentVs.voters.includes(user?._id || '');
     }
 
@@ -82,6 +83,12 @@ export const Home = ({socket}: HomeProps) => {
         });
     }
 
+    function shareOnFacebook() {
+        const url = `https://localhost:5000/facebook/share`;
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&display=popup&ref=plugin&src=share_button`,
+            '_isolated', 'width=600,height=400');
+    }
+
     return <>
         <Grid container>
             {versusItems?.map((value, k) => <Grid item xs={k % 2 === 0 ? 5 : 2} key={k}>
@@ -92,6 +99,9 @@ export const Home = ({socket}: HomeProps) => {
                     }
                 </Grid>
             )}
+            <Grid item>
+                <Button onClick={shareOnFacebook}>Share on facebook</Button>
+            </Grid>
         </Grid>
         {
             !versusItems?.length && <Box style={{display: 'flex', flexDirection: 'column'}}>
