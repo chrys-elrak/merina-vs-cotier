@@ -61,12 +61,6 @@ export function Navbar({ handleFacebookLogin }: NavbarProps) {
                   'aria-labelledby': 'basic-button',
                 }}
               >
-                <MenuItem onClick={handleClose}>
-                  <ListItemIcon>
-                    <AccountCircleIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>Profile</ListItemText>
-                </MenuItem>
                 <MenuItem onClick={() => navigation('create')}>
                   <ListItemIcon>
                     <Send fontSize="small" />
